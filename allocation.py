@@ -3,6 +3,9 @@ import pandas as pd
 import yaml
 import sys
 rng = np.random.default_rng(12345)
+import multiprocessing as mp
+from functools import partial
+
 
 ## Load config details from YAML
 def load_yaml(filename):
@@ -20,7 +23,7 @@ class model:
         # The initialization code should read a YAML config file and use it to define the basic parameters of the model
         self.config = load_yaml(config)
         self.option_df = pd.read_csv(self.config['location_options'])
-        self.id = self.config['geo_id']
+        self.id = self.config['option_id']
         self.option_df.set_index(self.id,drop=False,inplace=True)
         self.land_uses = self.config['land_uses']
         self.draws = self.config['draws']
@@ -32,7 +35,7 @@ class model:
     def allocate(self):
         start = time.time()
         # This method allocates land use control totals using Monte Carlo simulation
-        id = self.config['geo_id']
+        id = self.config['option_id']
         dev_queue = [] # enumerate a "queue" of development projects to build
         for LU in self.land_uses:
             store_fld = self.land_uses[LU]["store_fld"]
@@ -77,11 +80,29 @@ class model:
         for op in self.config['update_block']:
             self.option_df.eval(op, inplace=True)
 
-def main():
-    test_model = model(sys.argv[1])
+def run_allocation(config_path):
+    test_model = model(config_path)
     test_model.allocate()
     test_model.update()
-    test_model.option_df.to_csv(sys.argv[2], index=False)
+    return test_model.option_df
+
+def average_results(results):
+    avg_df = results[0].copy()
+    for col in avg_df.columns:
+        if pd.api.types.is_numeric_dtype(avg_df[col]):
+            avg_df[col] = sum(df[col] for df in results) / len(results)
+    return avg_df
+
+def main():
+    config_path = sys.argv[1]
+    output_path = sys.argv[2]
+    num_runs = 10
+
+    with mp.Pool(processes=num_runs) as pool:
+        results = pool.map(partial(run_allocation, config_path), range(num_runs))
+
+    averaged_df = average_results(results)
+    averaged_df.to_csv(output_path, index=False)
 
 if __name__=="__main__":
     main()

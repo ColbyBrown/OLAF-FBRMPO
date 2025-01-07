@@ -13,7 +13,7 @@ land_uses:
     # value function is passed to DataFrame.eval()
     value_fn: >
       bid_logsum*0.1875826 + 
-      intdens.N*1.5403721 +
+      intdens_N*1.5403721 +
       pct_sewer*0.0193174 + 
       is_MF*0.6578561 + 
       is_OR*3.2483276 + 
@@ -22,12 +22,12 @@ land_uses:
       pct_water*0.3268022 + 
       elevation*pct_steep*-0.016281 + 
       elevation*is_MF*2.5527434 + 
-      is_MF:avg_slope*-2.0949515 + 
-      is_MF:pct_water*0.1972128 + 
-      elevation:is_OR*-1.8275689 + 
-      is_OR:avg_slope*0.2743983 + 
-      is_OR:pct_water*-0.1399668
-    total: 1000
+      is_MF*avg_slope*-2.0949515 + 
+      is_MF*pct_water*0.1972128 + 
+      elevation*is_OR*-1.8275689 + 
+      is_OR*avg_slope*0.2743983 + 
+      is_OR*pct_water*-0.1399668
+    total: 28407
   DU_del:
     name: "dwelling units removed"
     market: "housing"
@@ -36,7 +36,7 @@ land_uses:
     # value function is passed to DataFrame.eval()
     value_fn: >
       -1*(bid_logsum*0.1875826 + 
-      intdens.N*1.5403721 +
+      intdens_N*1.5403721 +
       pct_sewer*0.0193174 + 
       is_MF*0.6578561 + 
       is_OR*3.2483276 + 
@@ -45,12 +45,12 @@ land_uses:
       pct_water*0.3268022 + 
       elevation*pct_steep*-0.016281 + 
       elevation*is_MF*2.5527434 + 
-      is_MF:avg_slope*-2.0949515 + 
-      is_MF:pct_water*0.1972128 + 
-      elevation:is_OR*-1.8275689 + 
-      is_OR:avg_slope*0.2743983 + 
-      is_OR:pct_water*-0.1399668)
-    total: 1000
+      is_MF*avg_slope*-2.0949515 + 
+      is_MF*pct_water*0.1972128 + 
+      elevation*is_OR*-1.8275689 + 
+      is_OR*avg_slope*0.2743983 + 
+      is_OR*pct_water*-0.1399668)
+    total: 9532
   EMP_add:
     name: "workspaces added"
     market: "business"
@@ -65,25 +65,25 @@ land_uses:
       is_Office*-19.374839 + 
       is_Special*-22.535318 + 
       pct_steep*-2.860402 + 
-      transit_pct*1.403499 + 
-      water_pct*0.194049 + 
-      sewer_pct*0.09087 + 
+      pct_transit*1.403499 + 
+      pct_water*0.194049 + 
+      pct_sewer*0.09087 + 
       pct_steep*is_Industrial*0.335667 + 
-      transit_pct*is_Industrial*-0.369398 + 
-      water_pct*is_Industrial*0.03727 + 
-      sewer_pct*is_Industrial*0.06423 + 
+      pct_transit*is_Industrial*-0.369398 + 
+      pct_water*is_Industrial*0.03727 + 
+      pct_sewer*is_Industrial*0.06423 + 
       pct_steep*is_Lodging*7.844066 + 
-      transit_pct*is_Lodging*0.562455 + 
-      water_pct*is_Lodging*2.680031 + 
-      sewer_pct*is_Lodging*0.672675 + 
+      pct_transit*is_Lodging*0.562455 + 
+      pct_water*is_Lodging*2.680031 + 
+      pct_sewer*is_Lodging*0.672675 + 
       pct_steep*is_Office*1.629512 + 
-      transit_pct*is_Office*-0.581202 + 
-      water_pct*is_Office*0.141043 + 
-      sewer_pct*is_Office*1.499008 + 
+      pct_transit*is_Office*-0.581202 + 
+      pct_water*is_Office*0.141043 + 
+      pct_sewer*is_Office*1.499008 + 
       pct_steep*is_Other*1.427296 + 
-      transit_pct*is_Other*-0.837501 + 
-      water_pct*is_Other*0.292862
-    total: 1000
+      pct_transit*is_Other*-0.837501 + 
+      pct_water*is_Other*0.292862
+    total: 46768
   EMP_del:
     name: "workspaces removed"
     market: "business"
@@ -98,26 +98,26 @@ land_uses:
       is_Office*-19.374839 + 
       is_Special*-22.535318 + 
       pct_steep*-2.860402 + 
-      transit_pct*1.403499 + 
-      water_pct*0.194049 + 
-      sewer_pct*0.09087 + 
+      pct_transit*1.403499 + 
+      pct_water*0.194049 + 
+      pct_sewer*0.09087 + 
       pct_steep*is_Industrial*0.335667 + 
-      transit_pct*is_Industrial*-0.369398 + 
-      water_pct*is_Industrial*0.03727 + 
-      sewer_pct*is_Industrial*0.06423 + 
+      pct_transit*is_Industrial*-0.369398 + 
+      pct_water*is_Industrial*0.03727 + 
+      pct_sewer*is_Industrial*0.06423 + 
       pct_steep*is_Lodging*7.844066 + 
-      transit_pct*is_Lodging*0.562455 + 
-      water_pct*is_Lodging*2.680031 + 
-      sewer_pct*is_Lodging*0.672675 + 
+      pct_transit*is_Lodging*0.562455 + 
+      pct_water*is_Lodging*2.680031 + 
+      pct_sewer*is_Lodging*0.672675 + 
       pct_steep*is_Office*1.629512 + 
-      transit_pct*is_Office*-0.581202 + 
-      water_pct*is_Office*0.141043 + 
-      sewer_pct*is_Office*1.499008 + 
+      pct_transit*is_Office*-0.581202 + 
+      pct_water*is_Office*0.141043 + 
+      pct_sewer*is_Office*1.499008 + 
       pct_steep*is_Other*1.427296 + 
-      transit_pct*is_Other*-0.837501 + 
-      water_pct*is_Other*0.292862)
-    total: 1000
+      pct_transit*is_Other*-0.837501 + 
+      pct_water*is_Other*0.292862)
+    total: 17036
 update_block: [
   "hh_final = hh_init + hh_add - hh_del",
-  "ws_final = exist_total_emp + alloc_total_emp"
+  "ws_final = ws_init + ws_add - ws_del"
 ]
