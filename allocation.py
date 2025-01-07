@@ -18,17 +18,15 @@ import time
 class model:
     def __init__(self,config):
         # The initialization code should read a YAML config file and use it to define the basic parameters of the model
-        # Examples: number of zones, number of product types
-        # Probabaly can use this to load initial supply inventory and capacity values by product type
         self.config = load_yaml(config)
-        self.zone_df = pd.read_csv(self.config['zonal_data'])
+        self.option_df = pd.read_csv(self.config['location_options'])
         self.id = self.config['geo_id']
-        self.zone_df.set_index(self.id,drop=False,inplace=True)
+        self.option_df.set_index(self.id,drop=False,inplace=True)
         self.land_uses = self.config['land_uses']
         self.draws = self.config['draws']
     def sample_alts(self,LU):
         # This method samples development options for a land use, respecting filters
-        sites_avail = self.zone_df.query(self.land_uses[LU]["filter_fn"]) 
+        sites_avail = self.option_df.query(self.land_uses[LU]["filter_fn"]) 
         site_sample = sites_avail.sample(self.draws,replace=False,axis=0)
         return(site_sample)
     def allocate(self):
@@ -38,7 +36,7 @@ class model:
         dev_queue = [] # enumerate a "queue" of development projects to build
         for LU in self.land_uses:
             store_fld = self.land_uses[LU]["store_fld"]
-            self.zone_df[store_fld] = 0 # initialize field to which units will be allocated
+            self.option_df[store_fld] = 0 # initialize field to which units will be allocated
             print("Enumerating " + self.land_uses[LU]['name'] + " to allocate")
             total = int(self.land_uses[LU]["total"])
             for draw in range(total):
@@ -71,19 +69,19 @@ class model:
             denom = np.sum(expUtil)
             probs = expUtil/denom
             zoneSel = rng.choice(options[id].to_numpy(),p=probs)
-            self.zone_df.at[zoneSel,store_fld] += 1
+            self.option_df.at[zoneSel,store_fld] += 1
         run_min = round((time.time()-start)/60,1)
         print(f"Total run time = {run_min} minutes")
     def update(self):
         # this is a function for custom updates on the dataframe before/after allocation
         for op in self.config['update_block']:
-            self.zone_df.eval(op, inplace=True)
+            self.option_df.eval(op, inplace=True)
 
 def main():
     test_model = model(sys.argv[1])
     test_model.allocate()
     test_model.update()
-    test_model.zone_df.to_csv(sys.argv[2], index=False)
+    test_model.option_df.to_csv(sys.argv[2], index=False)
 
 if __name__=="__main__":
     main()

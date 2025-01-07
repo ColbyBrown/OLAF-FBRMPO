@@ -1,62 +1,85 @@
-model_name: "demonstration model"
+model_name: "FBRMPO allocation model"
 model_version: 0.1
 scenario_name: "test scenario"
 location_options: "options.csv" 
 option_id: "option_id"
 draws: 30
 land_uses:
-  DU_add:
-    name: "dwelling units added"
+  SF_add:
+    name: "SF dwelling units added"
     market: "housing"
-    store_fld: "hh_add"
-    filter_fn: "(hh_init + hh_add - hh_del) <= (hh_cap - 1)" # passed to DataFrame.query()
+    store_fld: "SF_add"
+    filter_fn: "(hh_init + SF_add - SF_del + MF_add - MF_del) <= (hh_cap - 1)" # passed to DataFrame.query()
     # value function is passed to DataFrame.eval()
     value_fn: >
       bid_logsum*0.1875826 + 
-      intdens.N*1.5403721 +
+      intdens_N*1.5403721 +
       pct_sewer*0.0193174 + 
-      is_MF*0.6578561 + 
-      is_OR*3.2483276 + 
       elevation*4.9474182 + 
       avg_slope*-1.2718518 + 
       pct_water*0.3268022 + 
-      elevation*pct_steep*-0.016281 + 
-      elevation*is_MF*2.5527434 + 
-      is_MF:avg_slope*-2.0949515 + 
-      is_MF:pct_water*0.1972128 + 
-      elevation:is_OR*-1.8275689 + 
-      is_OR:avg_slope*0.2743983 + 
-      is_OR:pct_water*-0.1399668
-    total: 1000
-  DU_del:
-    name: "dwelling units removed"
+      elevation*pct_steep*-0.016281
+    total: 1050
+  SF_del:
+    name: "SF dwelling units removed"
     market: "housing"
-    store_fld: "hh_del"
-    filter_fn: "(hh_init + hh_add - hh_del) > 0" # passed to DataFrame.query()
+    store_fld: "SF_del"
+    filter_fn: "(hh_init + SF_add - SF_del + MF_add - MF_del) > 0" # passed to DataFrame.query()
     # value function is passed to DataFrame.eval()
     value_fn: >
       -1*(bid_logsum*0.1875826 + 
-      intdens.N*1.5403721 +
+      intdens_N*1.5403721 +
+      pct_sewer*0.0193174 + 
+      elevation*4.9474182 + 
+      avg_slope*-1.2718518 + 
+      pct_water*0.3268022 + 
+      elevation*pct_steep*-0.016281) 
+    total: 50
+  MF_add:
+    name: "MF dwelling units added"
+    market: "housing"
+    store_fld: "MF_add"
+    filter_fn: "(hh_init + SF_add - SF_del + MF_add - MF_del) <= (hh_cap - 1)" # passed to DataFrame.query()
+    # value function is passed to DataFrame.eval()
+    value_fn: >
+      bid_logsum*0.1875826 + 
+      intdens_N*1.5403721 +
       pct_sewer*0.0193174 + 
       is_MF*0.6578561 + 
-      is_OR*3.2483276 + 
       elevation*4.9474182 + 
       avg_slope*-1.2718518 + 
       pct_water*0.3268022 + 
       elevation*pct_steep*-0.016281 + 
       elevation*is_MF*2.5527434 + 
       is_MF:avg_slope*-2.0949515 + 
-      is_MF:pct_water*0.1972128 + 
-      elevation:is_OR*-1.8275689 + 
-      is_OR:avg_slope*0.2743983 + 
-      is_OR:pct_water*-0.1399668)
-    total: 1000
+      is_MF:pct_water*0.1972128
+    total: 1050
+  MF_del:
+    name: "MF dwelling units removed"
+    market: "housing"
+    store_fld: "MF_del"
+    filter_fn: "(hh_init + SF_add - SF_del + MF_add - MF_del) > 0" # passed to DataFrame.query()
+    # value function is passed to DataFrame.eval()
+    value_fn: >
+      -1*(bid_logsum*0.1875826 + 
+      intdens_N*1.5403721 +
+      pct_sewer*0.0193174 + 
+      is_MF*0.6578561 + 
+      elevation*4.9474182 + 
+      avg_slope*-1.2718518 + 
+      pct_water*0.3268022 + 
+      elevation*pct_steep*-0.016281 + 
+      elevation*is_MF*2.5527434 + 
+      is_MF:avg_slope*-2.0949515 + 
+      is_MF:pct_water*0.1972128)
+    total: 50
   EMP_add:
     name: "workspaces added"
     market: "business"
     store_fld: "ws_add"
     filter_fn: "(ws_init + ws_add - ws_del) <= (ws_cap - 1)"
     value_fn: >
+      bid_logsum*0.235483 +
       is_Commercial*-18.585542 + 
       is_Industrial*-17.409903 + 
       is_Institutional*-19.210086 + 
@@ -83,14 +106,15 @@ land_uses:
       pct_steep*is_Other*1.427296 + 
       transit_pct*is_Other*-0.837501 + 
       water_pct*is_Other*0.292862
-    total: 1000
+    total: 1050
   EMP_del:
     name: "workspaces removed"
     market: "business"
     store_fld: "ws_del"
     filter_fn: "(ws_init + ws_add - ws_del) >= 1"
     value_fn: >
-      -1*(is_Commercial*-18.585542 + 
+      -1*(bid_logsum*0.235483 +
+      is_Commercial*-18.585542 + 
       is_Industrial*-17.409903 + 
       is_Institutional*-19.210086 + 
       is_Lodging*-22.494078 + 
@@ -116,8 +140,10 @@ land_uses:
       pct_steep*is_Other*1.427296 + 
       transit_pct*is_Other*-0.837501 + 
       water_pct*is_Other*0.292862)
-    total: 1000
+    total: 50
 update_block: [
-  "hh_final = hh_init + hh_add - hh_del",
-  "ws_final = exist_total_emp + alloc_total_emp"
+  "HH_add = SF_add + MF_add",
+  "HH_del = SF_del + MF_del",
+  "hh_final = hh_init + HH_add - HH_del",
+  "ws_final = ws_init + ws_add - ws_del"
 ]
